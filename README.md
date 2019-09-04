@@ -1,7 +1,7 @@
 # nasspy
 Python wrappers for the National Agricultural Statistics Service's Quick Stats API.
 
-To use:
+**To use:**
     1) Create an api object: 
         api = NASS_API(<your nass key as a string>)
   
