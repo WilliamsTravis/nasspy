@@ -1,55 +1,73 @@
 # nasspy
-Python wrappers for the National Agricultural Statistics Service's Quick Stats API.
+Python wrappers for the U.S. National Agricultural Statistics Service's Quick Stats API.
 
-To use:
+To use (generally):
 
-    1) Create an api object: 
-        api = NASS_API(<your nass key as a string>)
-  
-    2) Get a list of available parameters with api.all_parameters
-    
-    3) Get a list of the definitions of these parameters using
-        api.what_parameters, api.where_parameters, and api.when_parameters
+1) Retrieve an API key from [NASS's QuickStats API page](https://quickstats.nass.usda.gov/api#param_define).
+   Save this key to the file 'api_key.txt', relative to your working directory or include it as an argument
+   when initializing. 
+2) Import NASS_API from nasspy into a Python environment and create an api object.
+3) Retrieve dataframes of available parameters and definitions.
+4) Retrieve a list of input options for any one parameter using.
+5) Build a query.
+6) And retrieve the results of that query as a Pandas data frame.
 
-    4) Get a list of input options for any one parameter using
-        api.get_parameter_options('parameter')
-
-    5) Build a query as a list of strings like this:
-        ['<parameter1>=<input1>', '<parameter2>=<input2>', ...]
-
-    6) Filter each query by appending an operator to each string element:
-        '<parameter><operator>=<input>'
-
-    7) For count use the query list as the argument in api.get_query_count:
-        data = api.get_query_count(query)
-
-    8) For the data itself use the query list in api.get_query:
-        data = api.get_query(query)
-
-In practice:
+To use (in practice):
   
 ```python
 from functions import NASS_API
         
-# 1) Create api object
-api = NASS_API()
+# 1) Create an api object
+api = NASS_API(keypath='~/.keys/nass_api_key.txt')
 
-# 2) Check available 'what', 'when', and 'where' parameters
+# 2) Check available 'what', 'when', and 'where' parameters as pandas dataframes
 whats = api.what_parameters
 wheres = api.where_parameters
 whens = api.when_paramaters
+print(whats)
+#>               Parameter  Max Length  \
+#> 0           source_desc          60   
+#> 1           sector_desc          60   
+#> 2            group_desc          80   
+#> 3        commodity_desc          80   
+#> 4            class_desc         180   
+#> 5   prodn_practice_desc         180   
+#> 6    util_practice_desc         180   
+#> 7     statisticcat_desc          80   
+#> 8             unit_desc          60   
+#> 9            short_desc         512   
+#> 10          domain_desc         256   
+#> 11       domaincat_desc         512   
+#> 12                value          24   
+#> 13                 CV %           7   
+#> 
+#>                                            Definition  
+#> 0   Source of data (CENSUS or SURVEY). Census prog...  
+#> 1   Five high level, broad categories useful to na...  
+#> 2   Subsets within sector (e.g., under sector = CR...  
+#> 3   The primary subject of interest (e.g., CORN, C...  
+#> 4   Generally a physical attribute (e.g., variety,...  
+#> 5   A method of production or action taken on the ...  
+#> 6   Utilizations (e.g., GRAIN, FROZEN, SLAUGHTER) ...  
+#> 7   The aspect of a commodity being measured (e.g....  
+#> 8   The unit associated with the statistic categor...  
+#> 9   A concatenation of six columns: commodity_desc...  
+#> 10  Generally another characteristic of operations...  
+#> 11  Categories or partitions within a domain (e.g....  
+#> 12   Published data value or suppression reason code.  
+#> 13  Coefficient of variation. Available for the 20...  
 
-# 3) For any one parameter, print out options
-api.get_parameter_options("commodity_desc")  # A 'What' option
+# 3) For any one parameter, return a list of options
+api.get_parameter_options("commodity_desc")
 #> ['AG LAND',
- 'AG SERVICES',
- 'AG SERVICES & RENT',
- 'ALCOHOL COPRODUCTS',
- 'ALMONDS',
- 'ALPACAS',
-  ... ]
+#>  'AG SERVICES',
+#>  'AG SERVICES & RENT',
+#>  'ALCOHOL COPRODUCTS',
+#>  'ALMONDS',
+#>  'ALPACAS',
+#>   ...]
 
-# 4) To query with a numeric parameter, one of these operators must be used
+# 3) To query with a numeric parameter, one of these operators must be used
 print(api.operator_options)
 #>          CALL   FAMILIAR ANALOG                  DESCRIPTION
 #> 0        __LE                <=       Less than or equal to.
@@ -62,12 +80,13 @@ print(api.operator_options)
 
 # For instance, to retrieve data for years since 1980 the 'When' query becomes:
 "year__GE=1980"
+#> 'year__GE=1980'
 
-# 5) Use these to build a list of queries (["<param><operator>=<option>", ...])
+# 4) Use these to build a list of queries (["<param><operator>=<option>", ...])
 query = ['state_name=IOWA', 'commodity_desc=CORN',  'year__GE=1950',
          'freq_desc=WEEKLY']
 
-# 6) And run that query to retrieve a pandas data frame
+# 5) And run that query to retrieve a pandas data frame
 data = api.get_query(query)
 
 # Unfortunately, unavailable queries are interpreted as bad requests:
@@ -76,5 +95,3 @@ query = ['state_name=IOWA', 'commodity_desc=CORN',  'year__GE=2014',
 api.get_query(query)
 #> {'error': ['bad request - invalid query']}
 ```
-
-<sup>Created on 2019-09-04 by the [reprexpy package](https://github.com/crew102/reprexpy)</sup>
