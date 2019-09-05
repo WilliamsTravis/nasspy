@@ -4,18 +4,17 @@ Python wrappers for the U.S. National Agricultural Statistics Service's Quick St
 To use (generally):
 
 1) Retrieve an API key from [NASS's QuickStats API page](https://quickstats.nass.usda.gov/api#param_define).
-   Save this key to the file 'api_key.txt', relative to your working directory or include it as an argument
-   when initializing. 
+   Save this key to a file or provide it directly as an argument. 
 2) Import NASS_API from nasspy into a Python environment and create an api object.
 3) Retrieve dataframes of available parameters and definitions.
 4) Retrieve a list of input options for any one parameter using.
-5) Build a query.
+5) Use the above parameters and options to build a query.
 6) And retrieve the results of that query as a Pandas data frame.
 
 To use (in practice):
   
 ```python
-from functions import NASS_API
+from nasspy import NASS_API
         
 # 1) Create an api object
 api = NASS_API(keypath='~/.keys/nass_api_key.txt')
