@@ -55,22 +55,20 @@ print(api.operator_options)
 #    e.g.: "year__GE=1980"  for years since 1980
 
 # 6) Use the above to build a query as alist of subqueries (["<param><operator>=<option>", ...])
-query = ['state_name=IOWA', 'commodity_desc=CORN',  'year__GE=1950',
-         'freq_desc=WEEKLY']
+query = ['state_name=IOWA', 'commodity_desc=CORN', 'year__GE=1950', 'freq_desc=WEEKLY']
 
 # 7) And run that query to retrieve a pandas data frame.
 data = api.get_query(query)
 
 # 8) Unfortunately, unavailable queries are interpreted as bad requests.
-query = ['state_name=IOWA', 'commodity_desc=CORN',  'year__GE=2014',
-         'freq_desc=WEEKLY', 'agg_level_desc=COUNTY']
+query = ['state_name=IOWA', 'commodity_desc=CORN',  'year__GE=2014', 'freq_desc=WEEKLY',
+         'agg_level_desc=COUNTY']
 api.get_query(query)
 #> {'error': ['bad request - invalid query']}
 
 # 9) And there is 50,000 record limit on returns.
 #    (Here, corn records since 1950 for all states with an "I" in their name)
-query = ['state_name_like=I', 'commodity_desc=CORN',  'year__GE=1950',
-         'freq_desc=WEEKLY']
+query = ['state_name_like=I', 'commodity_desc=CORN',  'year__GE=1950', 'freq_desc=WEEKLY']
 api.get_query(query)
 #> {'error': ['exceeds limit=50000']}
 ```
