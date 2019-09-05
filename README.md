@@ -23,38 +23,18 @@ api = NASS_API(keypath='~/.keys/nass_api_key.txt')
 whats = api.what_parameters
 wheres = api.where_parameters
 whens = api.when_paramaters
-print(whats)
+print(whats.head(4))
 #>               Parameter  Max Length  \
 #> 0           source_desc          60   
 #> 1           sector_desc          60   
 #> 2            group_desc          80   
 #> 3        commodity_desc          80   
-#> 4            class_desc         180   
-#> 5   prodn_practice_desc         180   
-#> 6    util_practice_desc         180   
-#> 7     statisticcat_desc          80   
-#> 8             unit_desc          60   
-#> 9            short_desc         512   
-#> 10          domain_desc         256   
-#> 11       domaincat_desc         512   
-#> 12                value          24   
-#> 13                 CV %           7   
 #> 
 #>                                            Definition  
 #> 0   Source of data (CENSUS or SURVEY). Census prog...  
 #> 1   Five high level, broad categories useful to na...  
 #> 2   Subsets within sector (e.g., under sector = CR...  
 #> 3   The primary subject of interest (e.g., CORN, C...  
-#> 4   Generally a physical attribute (e.g., variety,...  
-#> 5   A method of production or action taken on the ...  
-#> 6   Utilizations (e.g., GRAIN, FROZEN, SLAUGHTER) ...  
-#> 7   The aspect of a commodity being measured (e.g....  
-#> 8   The unit associated with the statistic categor...  
-#> 9   A concatenation of six columns: commodity_desc...  
-#> 10  Generally another characteristic of operations...  
-#> 11  Categories or partitions within a domain (e.g....  
-#> 12   Published data value or suppression reason code.  
-#> 13  Coefficient of variation. Available for the 20...  
 
 # 3) For any one parameter, return a list of options
 api.get_parameter_options("commodity_desc")  # A 'What' option
@@ -80,7 +60,6 @@ print(api.operator_options)
 # 5) For numeric parameters, it appears necessary to use an operator.
 #    e.g.: "year__GE=1980"  for years since 1980
 
-
 # 6) Use the above to build a list of queries (["<param><operator>=<option>", ...])
 query = ['state_name=IOWA', 'commodity_desc=CORN',  'year__GE=1950',
          'freq_desc=WEEKLY']
@@ -101,5 +80,3 @@ query = ['state_name_like=I', 'commodity_desc=CORN',  'year__GE=1950',
 api.get_query(query)
 #> {'error': ['exceeds limit=50000']}
 ```
-
-<sup>Created on 2019-09-04 by the [reprexpy package](https://github.com/crew102/reprexpy)</sup>
