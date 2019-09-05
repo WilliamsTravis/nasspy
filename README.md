@@ -67,8 +67,8 @@ query = ['state_name=IOWA', 'commodity_desc=CORN',  'year__GE=2014',
 api.get_query(query)
 #> {'error': ['bad request - invalid query']}
 
-# And there is 50,000 record limit on returns.
-# (Here, corn since 1950 for all states with an "I" in their name)
+# 9) And there is 50,000 record limit on returns.
+#    (Here, corn records since 1950 for all states with an "I" in their name)
 query = ['state_name_like=I', 'commodity_desc=CORN',  'year__GE=1950',
          'freq_desc=WEEKLY']
 api.get_query(query)
