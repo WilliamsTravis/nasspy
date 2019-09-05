@@ -40,7 +40,7 @@ api.get_parameter_options("commodity_desc")  # A 'What' option
 #>  'ALPACAS',
 #>   ...]
 
-# 4) Operators may appended to parameters for more flexible filtering.
+# 4) Operators may be appended to parameters for more flexible filtering.
 print(api.operator_options)
 #>          CALL   FAMILIAR ANALOG                  DESCRIPTION
 #> 0        __LE                <=       Less than or equal to.
