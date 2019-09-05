@@ -1,0 +1,8 @@
+CALL | FAMILIAR ANALOG | DESCRIPTION
+__LE | <= | Less than or equal to.
+__LT | < | Less than.
+__GT | > | Greater than.
+__GE | >= | Greater than or equal to.
+__NE | != | Not equal to.
+__LIKE | like | Pattern is in. 
+__NOT_LIKE | not like | Pattern is not in.

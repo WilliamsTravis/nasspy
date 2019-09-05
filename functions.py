@@ -8,6 +8,7 @@ Created on Mon Apr  8 12:20:13 2019
 from matplotlib import pyplot as plt
 import numpy as np
 import os
+from os.path import expanduser
 import pandas as pd
 import requests
 os.chdir('/home/travis/github/nasspy/')
@@ -26,7 +27,6 @@ class NASS_API:
     
     To use:
         1) Create an api object: 
-           
             api = NASS_API(<your nass key as a string>)
         2) Get a list of available parameters with api.all_parameters
         3) Get a list of the definitions of these parameters using
@@ -49,19 +49,19 @@ class NASS_API:
                 data = api.get_query(query)
     
     '''
-    def __init__(self, key='DCC6BBF9-EC39-3DD9-B3F5-AC642B764E99'):
-        self.key = key
-        self.sample_query = ('http://quickstats.nass.usda.gov/api/api_GET/?' +
-                             'key=<key>&commodity_desc=CORN&' +
-                             'year__GE=2010&state_alpha=VA ')
+    def __init__(self, keypath='~/.keys/nass_api_key.txt', key=None):
+        self.sample_query = ['commodity_desc=CORN', 'year__GE=2010', 
+                             'state_alpha=VA']
         self.url = 'http://quickstats.nass.usda.gov/api'
         self.website = 'https://quickstats.nass.usda.gov/api'
-        self.what_parameters = pd.read_table('data/nass_api_params_what.txt',
+        self.what_parameters = pd.read_csv('data/nass_api_params_what.txt',
                                              sep='|', index_col=False)
-        self.when_paramaters = pd.read_table('data/nass_api_params_when.txt',
+        self.when_paramaters = pd.read_csv('data/nass_api_params_when.txt',
                                              sep='|')
-        self.where_parameters = pd.read_table('data/nass_api_params_where.txt',
+        self.where_parameters = pd.read_csv('data/nass_api_params_where.txt',
                                              sep='|')
+        self.operator_options = pd.read_csv(
+                                 'data/nass_api_params_operators.txt', sep='|')
         self.all_parameters = ['source_desc', 'sector_desc', 'group_desc',
                                'commodity_desc', 'class_desc',
                                'prodn_practice_desc', 'util_practice_desc',
@@ -77,7 +77,20 @@ class NASS_API:
                                'watershed_desc', 'congr_district_code',
                                'country_code',  'country_name',
                                'location_desc']
-    
+        if not keypath and not key:
+            print("Request a NASS API key, save it in a local text file " +
+                  "(keypath argument) or use it directly (key argument): " +
+                  "\nhttps://quickstats.nass.usda.gov/api")
+        elif key:
+            self.key = key
+        elif keypath:
+            if '~' in keypath:
+                keypath = keypath.replace('~', expanduser('~'))
+            self.key = open(keypath).read().splitlines()[0]
+        else:
+            print("Looks like the key is incorrect. Request a NASS API key " +
+                  "at https://quickstats.nass.usda.gov/api")
+
     def print_operators(self):
         print("__LE = <= \n__LT = <\n__GT = >\n__GE = >= \n" +
               "__LIKE = like\n__NOT_LIKE = not like\n__NE = not equal ")
@@ -96,29 +109,17 @@ class NASS_API:
             
     def get_query_count(self, query):
         base = '/'.join([self.url, 'get_counts', '?key=']) + self.key
-        query = '&'.join(query)
-        request = '&'.join([base, query])
+        query_part = '&'.join(query)
+        request = '&'.join([base, query_part])
         r = requests.get(request)
         data = r.json()
         number = int(data['count'])
         return number
 
     def get_query(self, query):
-        base = '/'.join([self.url, 'api_GET', '?key=']) + self.key
-        query = '&'.join(query)
-        request = '&'.join([base, query])
-        r = requests.get(request)
-        data = r.json()
-        try:
-            df = pd.DataFrame(data['data']) 
-        except:
-            return data
-        return df
-
-    def query_to_csv(self, query, filename):
-        base = '/'.join([self.url, 'api_GET', '?key=']) + self.key
-        query = '&'.join(query)
-        request = '&'.join([base, query, 'format=csv'])
+        base_part = '/'.join([self.url, 'api_GET', '?key=']) + self.key
+        query_part = '&'.join(query)
+        request = '&'.join([base_part, query_part])
         r = requests.get(request)
         data = r.json()
         try:
@@ -128,10 +129,4 @@ class NASS_API:
         return df
 
 
-api = NASS_API()
-query = ['state_name=MONTANA', 'commodity_desc=CORN',
-         'year__GE=1980', 'freq_desc=WEEKLY']
-query = ['commodity=HAY', 'freq_desc=ANNUAL', 'state_name=COLORADO',
-         'year__GE=2015']
-api.get_query_count(query)
-data = api.get_query(query)
+
