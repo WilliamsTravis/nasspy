@@ -14,7 +14,7 @@ To use (generally):
 To use (in practice):
   
 ```python
-from functions import NASS_API
+from nasspy import NASS_API
         
 # 1) Create an api object.
 api = NASS_API(keypath='~/.keys/nass_api_key.txt')
