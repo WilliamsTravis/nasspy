@@ -1,4 +1,4 @@
-## nasspy
+# nasspy
 Python wrappers for the U.S. National Agricultural Statistics Service's Quick Stats API.
 
 To use (generally):
@@ -14,10 +14,10 @@ To use (generally):
 To use (in practice):
   
 ```python
-from nasspy import NASS_API
+from nasspy import nass_api
 ```
 
-# 1) Create an api object.
+### 1) Create an api object.
 ```python
 api = NASS_API(keypath='~/.keys/nass_api_key.txt')
 ```
