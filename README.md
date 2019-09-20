@@ -1,7 +1,7 @@
 # nasspy
-Python wrappers for the U.S. National Agricultural Statistics Service's Quick Stats API.
+#### Python wrappers for the U.S. National Agricultural Statistics Service's Quick Stats API.
 
-To use (generally):
+#### To use (generally):
 
 1) Retrieve an API key from [NASS's QuickStats API page](https://quickstats.nass.usda.gov/api#param_define).
    Save this key to a file or provide it directly as an argument. 
@@ -11,18 +11,18 @@ To use (generally):
 5) Use the above parameters and options to build a query.
 6) And retrieve the results of that query as a Pandas data frame.
 
-To use (in practice):
+#### To use (in practice):
   
 ```python
 from nasspy import nass_api
 ```
 
-### 1) Create an api object.
+#### 1) Create an api object.
 ```python
 api = NASS_API(keypath='~/.keys/nass_api_key.txt')
 ```
 
-# 2) Check available 'what', 'when', and 'where' parameters as Pandas dataframes.
+#### 2) Check available 'what', 'when', and 'where' parameters as Pandas dataframes.
 ```python
 whats = api.what_parameters
 wheres = api.where_parameters
@@ -35,7 +35,7 @@ print(whats.head(4))
 #> 3        commodity_desc          80   The primary subject of interest (e.g., CORN, C... 
 ```
 
-# 3) For any one parameter, return a list of options.
+##### 3) For any one parameter, return a list of options.
 ```python
 api.get_parameter_options("commodity_desc")  # A 'What' option
 #> ['AG LAND',
@@ -47,7 +47,7 @@ api.get_parameter_options("commodity_desc")  # A 'What' option
 #>   ...]
 ```
 
-# 4) Operators may be appended to parameters for more flexible filtering.
+#### 4) Operators may be appended to parameters for more flexible filtering.
 ```python
 print(api.operator_options)
 #>          CALL   FAMILIAR ANALOG                  DESCRIPTION
@@ -61,26 +61,26 @@ print(api.operator_options)
 ```
 
 
-# 5) For numeric parameters, it appears necessary to use an operator (e.g.: "year__GE=1980"  for years since 1980).
+#### 5) For numeric parameters, it appears necessary to use an operator (e.g.: "year__GE=1980"  for years since 1980).
 
-# 6) Use the above to build a query as alist of subqueries (["<param><operator>=<option>", ...])
+#### 6) Use the above to build a query as alist of subqueries (["<param><operator>=<option>", ...])
 ```python
 query = ['state_name=IOWA', 'commodity_desc=CORN', 'year__GE=1950', 'freq_desc=WEEKLY']
 ```
  
-# 7) And run that query to retrieve a pandas data frame.
+#### 7) And run that query to retrieve a pandas data frame.
 ```python
 data = api.get_query(query)
 ```
 
-# 8) Unfortunately, unavailable queries are interpreted as bad requests.
+#### 8) Unfortunately, unavailable queries are interpreted as bad requests.
 ```python
 query = ['state_name=IOWA', 'commodity_desc=ALPACAS', 'year__GE=1950', 'freq_desc=WEEKLY']
 api.get_query(query)
 #> {'error': ['bad request - invalid query']}
 ```
 
-# 9) And there is 50,000 record limit on returns. Here, corn records since 1950 for all states with an "I" in their name.
+#### 9) And there is 50,000 record limit on returns. Here, corn records since 1950 for all states with an "I" in their name.
 ```python
 query = ['state_name_like=I', 'commodity_desc=CORN',  'year__GE=1950', 'freq_desc=WEEKLY']
 api.get_query(query)
