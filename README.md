@@ -23,6 +23,10 @@ from nasspy import nass_api
 #### 1) Create an api object.
 ```python
 api = nass_api(keypath='~/.keys/nass_api_key.txt')
+
+# or 
+
+api = nass_api(key="KEYCHARACTERSHERE")
 ```
 
 #### 2) Check available 'what', 'when', and 'where' parameters as Pandas dataframes.
