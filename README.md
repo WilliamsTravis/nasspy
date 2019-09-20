@@ -71,6 +71,15 @@ query = ['state_name=IOWA', 'commodity_desc=CORN', 'year__GE=1950', 'freq_desc=W
 #### 7) And run that query to retrieve a pandas data frame.
 ```python
 data = api.get_query(query)
+print(data.head())
+#> CV (%) Value agg_level_desc asd_code asd_desc  ... watershed_code watershed_desc week_ending  year zip_5
+#> 0            6          STATE                    ...       00000000                 2019-06-02  2019      
+#> 1            7          STATE                    ...       00000000                 2019-06-09  2019      
+#> 2            8          STATE                    ...       00000000                 2019-06-16  2019      
+#> 3           10          STATE                    ...       00000000                 2019-06-23  2019      
+#> 4           11          STATE                    ...       00000000                 2019-06-30  2019      
+#>
+#> [5 rows x 39 columns]
 ```
 
 #### 8) Unfortunately, unavailable queries are interpreted as bad requests.
