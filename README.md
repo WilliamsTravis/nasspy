@@ -63,7 +63,7 @@ print(api.operator_options)
 
 #### 5) For numeric parameters, it appears necessary to use an operator (e.g.: "year__GE=1980"  for years since 1980).
 
-#### 6) Use the above to build a query as alist of subqueries (["<param><operator>=<option>", ...])
+#### 6) Use the above to build a query as alist of subqueries '<param><operator>=<option>'
 ```python
 query = ['state_name=IOWA', 'commodity_desc=CORN', 'year__GE=1950', 'freq_desc=WEEKLY']
 ```
