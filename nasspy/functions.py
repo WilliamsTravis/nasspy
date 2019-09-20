@@ -1,33 +1,28 @@
-# -*- coding: utf-8 -*-
-"""
-An interface for NASS API
-Created on Mon Apr  8 12:20:13 2019
-@author: User
-"""
 
-from matplotlib import pyplot as plt
-import numpy as np
-import os
 from os.path import expanduser
+import os
 import pandas as pd
 import requests
-os.chdir('/home/travis/github/nasspy/')
 
-class NASS_API:
+_root = os.path.abspath(os.path.dirname(__file__))
+def dp(path):
+    return os.path.join(_root, 'data', path)
+
+class nass_api:
     '''
-    This class just builds queries and returns data from the NASS API.  
+    This class just builds queries and returns data from the NASS API.
     The structure of the query is based on what, when, and where questions.
     You can also filter the results by appending operators to the parameter.
     The three types of queries are separated into the methods
     get_parameter_options, get_query_count, and get_query.
-    
+
     They only allow requests with less than 50,000 entries, which is rather
     small. For the whole thing go here!:
         ftp://ftp.nass.usda.gov/quickstats
-    
+
     To use:
-        1) Create an api object: 
-            api = NASS_API(<your nass key as a string>)
+        1) Create an api object:
+            api = NASS_API(key=<your nass key as a string>)
         2) Get a list of available parameters with api.all_parameters
         3) Get a list of the definitions of these parameters using
             api.what_parameters, api.where_parameters, and api.when_parameters
@@ -43,25 +38,25 @@ class NASS_API:
             data = api.get_query(query)
         9) Examples:
             Retrieve weekly corn yields from Montana since 1980:
-            
+
                 query = ['state_name=MONTANA', 'commodity_desc=CORN',
                          'year__GE=1980', 'freq_desc=WEEKLY']
                 data = api.get_query(query)
-    
+
     '''
     def __init__(self, keypath='~/.keys/nass_api_key.txt', key=None):
-        self.sample_query = ['commodity_desc=CORN', 'year__GE=2010', 
+        self.sample_query = ['commodity_desc=CORN', 'year__GE=2010',
                              'state_alpha=VA']
         self.url = 'http://quickstats.nass.usda.gov/api'
         self.website = 'https://quickstats.nass.usda.gov/api'
-        self.what_parameters = pd.read_csv('data/nass_api_params_what.txt',
+        self.what_parameters = pd.read_csv(dp('nass_api_params_what.txt'),
                                              sep='|', index_col=False)
-        self.when_paramaters = pd.read_csv('data/nass_api_params_when.txt',
+        self.when_paramaters = pd.read_csv(dp('nass_api_params_when.txt'),
                                              sep='|')
-        self.where_parameters = pd.read_csv('data/nass_api_params_where.txt',
-                                             sep='|')
-        self.operator_options = pd.read_csv(
-                                 'data/nass_api_params_operators.txt', sep='|')
+        self.where_parameters = pd.read_csv(dp('nass_api_params_where.txt'),
+                                            sep='|')
+        self.operator_options = pd.read_csv(dp('nass_api_params_operators.txt'),
+                                            sep='|')
         self.all_parameters = ['source_desc', 'sector_desc', 'group_desc',
                                'commodity_desc', 'class_desc',
                                'prodn_practice_desc', 'util_practice_desc',
@@ -106,7 +101,7 @@ class NASS_API:
         data = r.json()
         options = data[parameter]
         return options
-            
+
     def get_query_count(self, query):
         base = '/'.join([self.url, 'get_counts', '?key=']) + self.key
         query_part = '&'.join(query)
@@ -123,10 +118,7 @@ class NASS_API:
         r = requests.get(request)
         data = r.json()
         try:
-            df = pd.DataFrame(data['data']) 
+            df = pd.DataFrame(data['data'])
         except:
             return data
         return df
-
-
-

@@ -5,10 +5,10 @@ Created on Wed Sep  4 20:31:46 2019
 @author: travis
 """
 from reprexpy import reprex
-from nasspy import nass_api
+from functions import NASS_API
         
 # 1) Create an api object
-api = nass_api(keypath='~/.keys/nass_api_key.txt')
+api = NASS_API(keypath='~/.keys/nass_api_key.txt')
 
 # 2) Check available 'what', 'when', and 'where' parameters as pandas dataframes
 whats = api.what_parameters
@@ -31,7 +31,6 @@ query = ['state_name=IOWA', 'commodity_desc=CORN',  'year__GE=1950',
 
 # 7) And run that query to retrieve a pandas data frame
 data = api.get_query(query)
-print(data.head())
 
 # 8) Unfortunately, unavailable queries are interpreted as bad requests:
 query = ['state_name=IOWA', 'commodity_desc=ALPACAS',  'year__GE=1950',
