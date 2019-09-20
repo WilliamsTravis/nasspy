@@ -8,7 +8,7 @@
 
 1) Retrieve an API key from [NASS's QuickStats API page](https://quickstats.nass.usda.gov/api#param_define).
    Save this key to a file or provide it directly as an argument. 
-2) Import the nasspy class from the nasspy package into a Python environment and create an api object.
+2) Import the nass_api class from nasspy into a Python environment and create an api object.
 3) Retrieve dataframes of available parameters and definitions.
 4) Retrieve a list of input options for any one parameter.
 5) Use the above parameters and options to build a query.
