@@ -50,9 +50,9 @@ class nass_api:
         self.url = 'http://quickstats.nass.usda.gov/api'
         self.website = 'https://quickstats.nass.usda.gov/api'
         self.what_parameters = pd.read_csv(dp('nass_api_params_what.txt'),
-                                             sep='|', index_col=False)
+                                           sep='|', index_col=False)
         self.when_paramaters = pd.read_csv(dp('nass_api_params_when.txt'),
-                                             sep='|')
+                                           sep='|')
         self.where_parameters = pd.read_csv(dp('nass_api_params_where.txt'),
                                             sep='|')
         self.operator_options = pd.read_csv(dp('nass_api_params_operators.txt'),
