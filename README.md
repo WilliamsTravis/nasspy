@@ -1,6 +1,9 @@
 # nasspy
 #### Python wrappers for the U.S. National Agricultural Statistics Service's Quick Stats API.
 
+#### To install:
+'python setup.py install`
+
 #### To use (generally):
 
 1) Retrieve an API key from [NASS's QuickStats API page](https://quickstats.nass.usda.gov/api#param_define).
