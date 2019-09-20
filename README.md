@@ -2,7 +2,7 @@
 #### Python wrappers for the U.S. National Agricultural Statistics Service's Quick Stats API.
 
 #### To install:
-'python setup.py install`
+`python setup.py install`
 
 #### To use (generally):
 
