@@ -72,7 +72,7 @@ print(api.operator_options)
 
 #### 6) Use the above to build a query as alist of subqueries (`["<param><operator>=<option>", ...]`)
 ```python
-query = ['state_name=IOWA', 'commodity_desc=CORN', 'year__GE=1950', 'freq_desc=WEEKLY']
+query = ['state_name=IOWA', 'commodity_desc=CORN', 'year__GE=2018', 'freq_desc=WEEKLY']
 ```
  
 #### 7) And run that query to retrieve a pandas data frame.
@@ -91,7 +91,7 @@ print(data.head())
 
 #### 8) Unfortunately, unavailable queries are interpreted as bad requests.
 ```python
-query = ['state_name=IOWA', 'commodity_desc=ALPACAS', 'year__GE=1950', 'freq_desc=WEEKLY']
+query = ['state_name=IOWA', 'commodity_desc=ALPACAS', 'year__GE=2018', 'freq_desc=WEEKLY']
 api.get_query(query)
 #> {'error': ['bad request - invalid query']}
 ```
