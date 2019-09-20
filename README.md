@@ -35,7 +35,7 @@ print(whats.head(4))
 #> 3        commodity_desc          80   The primary subject of interest (e.g., CORN, C... 
 ```
 
-##### 3) For any one parameter, return a list of options.
+#### 3) For any one parameter, return a list of options.
 ```python
 api.get_parameter_options("commodity_desc")  # A 'What' option
 #> ['AG LAND',
