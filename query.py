@@ -6,7 +6,7 @@ Created on Wed Sep  4 20:31:46 2019
 """
 from reprexpy import reprex
 from nasspy import nass_api
-        
+
 # 1) Create an api object
 api = nass_api(keypath='~/.keys/nass_api_key.txt')
 
