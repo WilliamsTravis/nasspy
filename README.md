@@ -20,7 +20,7 @@
 from nasspy import nass_api
 ```
 
-#### 1) Create an api object.
+#### 1) Create an api object. To use the NASS API key, save it to a file, input it directly as an argument, or follow the prompts.
 ```python
 api = nass_api(keypath='~/.keys/nass_api_key.txt')
 
