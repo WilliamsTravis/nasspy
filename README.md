@@ -20,20 +20,24 @@
 from nasspy import nass_api
 ```
 
-#### 1) Create an api object.
+#### 1) Create an api object. To use your NASS API key follow the prompts to set and save the key to a file using the default save path. The default save path is ~/.keys/nass_api_key.txt. You may also save the key to a specific file and specify that file path when creating the object. You may also enter the key directly as an argument and have it saved to the file path specified. 
 ```python
-api = nass_api(keypath='~/.keys/nass_api_key.txt')
+api = nass_api()
+
+# or
+
+api = nass_api(keypath='/any/path/anyfile.txt')
 
 # or 
 
-api = nass_api(key="KEYCHARACTERSHERE")
+api = nass_api(key="KEYCHARACTERSHERE", keypath='/any/path/anyfile.txt')
 ```
 
 #### 2) Check available 'what', 'when', and 'where' parameters as Pandas dataframes.
 ```python
 whats = api.what_parameters
 wheres = api.where_parameters
-whens = api.when_paramaters
+whens = api.when_parameters
 print(whats.head(4))
 #>               Parameter  Max Length   Definition 
 #> 0           source_desc          60   Source of data (CENSUS or SURVEY). Census prog...  
