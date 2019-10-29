@@ -37,19 +37,45 @@ class nass_api:
                                'watershed_desc', 'congr_district_code',
                                'country_code',  'country_name',
                                'location_desc']
-        if not keypath and not key:
-            print("Request a NASS API key, save it in a local text file " +
-                  "(keypath argument) or use it directly (key argument): " +
-                  "\nhttps://quickstats.nass.usda.gov/api")
-        elif key:
-            self.key = key
-        elif keypath:
-            if '~' in keypath:
+        if '~' in keypath:
                 keypath = keypath.replace('~', expanduser('~'))
-            self.key = open(keypath).read().splitlines()[0]
-        else:
-            print("Looks like the key is incorrect. Request a NASS API key " +
-                  "at https://quickstats.nass.usda.gov/api")
+        self.keypath = keypath
+        self.key = key
+        self.save_key()
+
+
+    def save_key(self):
+        # Nothing entered
+        if not os.path.exists(self.keypath) and not self.key:
+            self.keygen()
+
+        # Key file with not explicit key
+        elif os.path.exists(self.keypath) and not self.key:
+            self.key = open(self.keypath).read().splitlines()[0]
+
+        # Now check the key with a sample query
+        sample_query = ['state_name=IOWA', 'commodity_desc=CORN',
+                       'year__GE=2018', 'freq_desc=yearly']
+        check = 0
+        while check == 0:
+            r = self.get_query(sample_query)
+            if ['unauthorized'] in r.values():
+                print("\nUnauthorized key, try again")
+                self.keygen()
+            else:
+                check = 1
+
+    def keygen(self):
+
+        print("Request a NASS API key here: " +
+              "\nhttps://quickstats.nass.usda.gov/api \n")
+        if not os.path.exists(os.path.dirname(self.keypath)):
+            os.makedirs(os.path.dirname(self.keypath))
+        key = input("Enter nass key: ")
+        with open(expanduser(self.keypath), "r+") as keyfile:
+            keyfile.write(key)
+        print("NASS API key saved to " + self.keypath)
+        self.key = key
 
     def print_operators(self):
         print("__LE = <= \n__LT = <\n__GT = >\n__GE = >= \n" +

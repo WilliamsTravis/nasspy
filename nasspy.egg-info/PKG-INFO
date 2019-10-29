@@ -31,6 +31,10 @@ Description: # nasspy
         #### 1) Create an api object.
         ```python
         api = nass_api(keypath='~/.keys/nass_api_key.txt')
+        
+        # or 
+        
+        api = nass_api(key="KEYCHARACTERSHERE")
         ```
         
         #### 2) Check available 'what', 'when', and 'where' parameters as Pandas dataframes.
@@ -76,7 +80,7 @@ Description: # nasspy
         
         #### 6) Use the above to build a query as alist of subqueries (`["<param><operator>=<option>", ...]`)
         ```python
-        query = ['state_name=IOWA', 'commodity_desc=CORN', 'year__GE=1950', 'freq_desc=WEEKLY']
+        query = ['state_name=IOWA', 'commodity_desc=CORN', 'year__GE=2018', 'freq_desc=WEEKLY']
         ```
          
         #### 7) And run that query to retrieve a pandas data frame.
@@ -95,7 +99,7 @@ Description: # nasspy
         
         #### 8) Unfortunately, unavailable queries are interpreted as bad requests.
         ```python
-        query = ['state_name=IOWA', 'commodity_desc=ALPACAS', 'year__GE=1950', 'freq_desc=WEEKLY']
+        query = ['state_name=IOWA', 'commodity_desc=ALPACAS', 'year__GE=2018', 'freq_desc=WEEKLY']
         api.get_query(query)
         #> {'error': ['bad request - invalid query']}
         ```
