@@ -1,19 +1,51 @@
 import copy
 import datetime as dt
-import math
+import numpy as np
 from os.path import expanduser
 import os
 import pandas as pd
 import requests
+import sys
+from tqdm import tqdm
 
+# For data, find local path of this package
 _root = os.path.abspath(os.path.dirname(__file__))
+
+
+# Data path
 def dp(path):
     return os.path.join(_root, 'data', path)
 
+
+# Extract non-digits from a string
+def notDigits(string):
+    return "".join([s for s in string if not s.isdigit()])
+
+# Extract digits from a string
+def isDigits(string):
+    return "".join([s for s in string if s.isdigit()])
+
+
+# Check if a string contains any of a list of other strings
+def isIn(string, strings):
+    return any(s in string for s in strings)
+
+
+# Fix the comma problem in a pandas series
+def fixValues(value):
+    if ',' in value:
+        value = value.replace(',', '')
+    try:
+        return float(value)
+    except:
+        return np.nan
+        
+
+# The API wrapper 
 class nass_api:
     def __init__(self, keypath='~/.keys/nass_api_key.txt', key=None):
-        self.sample_query = ['commodity_desc=CORN', 'year__GE=2010',
-                             'state_alpha=VA']
+        self.sample_query = ['commodity_desc=CORN', 'freq_desc=ANNUAL',
+                             'year=1950', 'state_alpha=VA']
         self.api_url = 'http://quickstats.nass.usda.gov/api'
         self.quickstats_url = 'https://quickstats.nass.usda.gov/api'
         self.what_parameters = pd.read_csv(dp('nass_api_params_what.txt'),
@@ -58,113 +90,121 @@ class nass_api:
         return options
 
     def get_query_count(self, query):
-        base = '/'.join([self.api_url, 'get_counts', '?key=']) + self.key
-        query_part = '&'.join(query)
-        request = '&'.join([base, query_part])
+        # Get just the count of the request
+        request = self._build_request(query, count=True)
         r = requests.get(request)
         data = r.json()
-        number = int(data['count'])
-        return number
+        try:
+            number = int(data['count'])
+            return number
+        except:
+            return data
 
     def get_query(self, query):
+        # Check for issues
+        self._query_check(query)
+
         # Check the number of records available first
         n = self.get_query_count(query)
 
-        # If n is greater than 50,000
-        if n <= 50000:
-            df = self._get_one_query(query)
+        try:
+            # If n is greater than 50,000
+            if n <= 50000:
+                df = self._get_one_query(query)
+            else:
+                print("More than 50,000 records, attempting to split query by " +
+                      "year...")
+    
+                # Get Query data
+                df = self._get_queries(query, n)
+
+            return df
+
+        except:
+            return n
+
+
+    # Is it better to define these externally?
+    def _build_request(self, query, count=False):
+        # Build just the requests
+        if count:
+            base = '/'.join([self.api_url, 'get_counts', '?key=']) + self.key
+            query_part = '&'.join(query)
+            request = '&'.join([base, query_part])
         else:
-            print("More than 50,000 records, attempting to split query by " +
-                  "year...")
-
-            # Get Query data
-            df = self._get_queries(n, query)
-
-        return df
+            base_part = '/'.join([self.api_url, 'api_GET', '?key=']) + self.key
+            query_part = '&'.join(query)
+            request = '&'.join([base_part, query_part])
+        return request
 
     def _get_one_query(self, query):
-        # Build the full request url
-        base_part = '/'.join([self.api_url, 'api_GET', '?key=']) + self.key
-        query_part = '&'.join(query)
-        request = '&'.join([base_part, query_part])
+        # Use if n requests is small enough
+        request = self._build_request(query)
         r = requests.get(request)
         data = r.json()
         try:
             return pd.DataFrame(data['data'])
         except:
-            return data
+            print("Could not create data frame from query: \n" + str(query))
 
-    def _get_queries(self, n, query):
+    def _get_queries(self, query, n):
+        # Because we can't use year ranges, we have to use individual years
 
-        # If we have any year filters
+        # Check if we have any year filters (one operator or multiple years)
         year_check = [q for q in query if "year" in q]
 
-        # Get none numbers 
-        def notYear(string):
-            return "".join([s for s in string if not s.isdigit()])
-        op_check = [notYear(yc) for yc in year_check]
+        # If there are multiple single year queries we cant handle it yet.
+        if len(year_check) > 1:
+            print("Failure: Query already split by year, try refining your" +
+                  "request.")
+            return
 
-        # There are several cases:
-        # Case 1: multiple single years
-        if not any([oc for oc in op_check if oc in self.operator_options['CALL']]):
-            pass
+        # If there isn't a year operator, that means the whole record
+        elif len(year_check) == 0:
+            year1 = 1900
+            year2 = dt.datetime.today().year
             
-#
-#        # If we have a year range
-#        if len(year_check) == 2:
-#            query_copy = copy.copy(query)
-#            yc1 = [y for y in year_check if "GE" in y][0]
-#            yc2 = [y for y in year_check if "LE" in y][0]
-#            query_copy.remove(yc1)
-#            query_copy.remove(yc2)
-#            year1 = int("".join([y for y in yc1 if y.isdigit()]))
-#            year2 = int("".join([y for y in yc2 if y.isdigit()]))
-#
-#        # If we only have one year filter
-#        elif len(year_check) == 1:
-#            yc = year_check[0]
-#            query_copy = copy.copy(query)
-#            query_copy.remove(yc)
-#            year1 = int("".join([y for y in yc if y.isdigit()]))
-#
-#            # GE goes to present
-#            if '__GE' in yc:
-#                year2 = dt.datetime.today().year
-#
-#            # LE goes to past
-#            if '__LE' in yc:
-#                year2 = year1
-#                year1 = 1900
-#
-#        # If we have no year filters the full record is used
-#        elif len(year_check) == 0:
-#            query_copy = copy.copy(query)
-#            year1 = 1900
-#            year2 = dt.datetime.today().year
-#
-#        # Build queries - tricky
-#        queries = self._split_queries(n, year1, year2, query_copy)
-#        rlist = [self._get_one_query(q) for q in queries]
-#
-#        # We may not have split this enough
-#        error_idx = [rlist.index(rl) for rl in rlist if
-#                     type(rl) != pd.core.frame.DataFrame]
-#        rlist2 = [rl for rl in rlist if type(rl) == pd.core.frame.DataFrame]
-#
-#        for idx in error_idx:
-#            n = self.get_query_count(queries[idx])
-#            year_check = [q for q in queries[idx] if "year" in q]
-#            q = queries[idx]
-#            query_copy = copy.copy(q)
-#            yc1 = [y for y in year_check if "GE" in y][0]
-#            yc2 = [y for y in year_check if "LE" in y][0]
-#            query_copy.remove(yc1)
-#            query_copy.remove(yc2)
-#            year1 = int("".join([y for y in yc1 if y.isdigit()]))
-#            year2 = int("".join([y for y in yc2 if y.isdigit()])) 
-#            qs = self._split_queries(n, year1, year2, q)
-#
-#        df = pd.concat(rlist2)
+        # If there is an operator, which is it and what year?
+        else:
+            ops = self.operator_options['CALL'].values
+            yc = year_check[0]
+            year = int(isDigits(yc))
+            op = [o for o in ops if o in yc][0]
+
+            # Year 1 and 2 depend on the operator
+            if op == '__GE':
+                year1 = year
+                year2 = dt.datetime.today().year
+            elif op == '__LE':
+                year1 = 1900
+                year2 = year
+            else:
+                print("Haven't worked out the " + op + "case yet. Try a " +
+                      " different operator for now.")
+                return
+
+        # Remove the original year operator from the query
+        query_copy = copy.copy(query)
+        for yc in year_check:
+            query_copy.remove(yc)
+
+        # Now we can generate a list of single year queries
+        year_queries = ["year=" + str(y) for y in range(year1, year2 + 1)]
+
+        # And with that individual full queries
+        queries = [query_copy + [yq] for yq in year_queries]
+
+        # And with that, get a list of data frames
+        request_list = [self._get_one_query(q) for
+                        q in tqdm(queries, position=0, file=sys.stdout)]
+        
+        # And if that works, concatenate these into one data frame
+        df = pd.concat(request_list, sort=True)
+        df['Value'] = df['Value'].apply(fixValues)
+        df = df.dropna(subset=['Value'])
+
+        # Done.
+        return df
 
     def _keygen(self):
 
@@ -178,6 +218,22 @@ class nass_api:
         print("NASS API key saved to " + self.keypath)
         self.key = key
 
+    def _query_check(self, query):
+        '''
+        There are some situations/errors that might go unnoticed.
+        '''
+        # Check if we have any year filters
+        year_check = [q for q in query if "year" in q]
+        op_check = [notDigits(yc) for yc in year_check]
+        ops = self.operator_options['CALL'].values
+        year_op_check = [op for op in op_check if isIn(op, ops)]
+
+        # If there are more than one year operators it only considers one
+        if len(year_op_check) > 1:
+            print("Please use only one year operator. Multiple single year " +
+                  "queries are fine, though.")
+            return
+
     def _save_key(self):
         # Nothing entered
         if not os.path.exists(self.keypath) and not self.key:
@@ -188,12 +244,10 @@ class nass_api:
             self.key = open(self.keypath).read().splitlines()[0]
 
         # Now check the key with a sample query
-        sample_query = ['state_name=IOWA', 'commodity_desc=CORN',
-                       'year__GE=2018', 'freq_desc=yearly']
         check = 0
         while check == 0:
-            r = self.get_query(sample_query)
-            if ['unauthorized'] in r.values():
+            df = self.get_query(self.sample_query)
+            if type(df) is dict and ['unauthorized'] in df.values():
                 print("\nUnauthorized key, try again")
                 self._keygen()
             else:
