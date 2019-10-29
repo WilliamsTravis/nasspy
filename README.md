@@ -37,7 +37,7 @@ api = nass_api(key="KEYCHARACTERSHERE", keypath='/any/path/anyfile.txt')
 ```python
 whats = api.what_parameters
 wheres = api.where_parameters
-whens = api.when_paramaters
+whens = api.when_parameters
 print(whats.head(4))
 #>               Parameter  Max Length   Definition 
 #> 0           source_desc          60   Source of data (CENSUS or SURVEY). Census prog...  
