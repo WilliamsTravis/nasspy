@@ -20,7 +20,7 @@
 from nasspy import nass_api
 ```
 
-#### 1) Create an api object. To use your NASS API key follow the prompts to set and save the key to a file using the default save path. The default save path is ~/.keys/nass_api_key.txt. You may also save the key to a specific file and specify that file path when creating the object, or enter file directly as an argument and have it saved to the file path specified. 
+#### 1) Create an api object. To use your NASS API key follow the prompts to set and save the key to a file using the default save path. The default save path is ~/.keys/nass_api_key.txt. You may also save the key to a specific file and specify that file path when creating the object. You may also enter the key directly as an argument and have it saved to the file path specified. 
 ```python
 api = nass_api()
 
