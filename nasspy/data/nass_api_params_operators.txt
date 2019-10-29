@@ -1,4 +1,4 @@
-CALL | FAMILIAR ANALOG | DESCRIPTION
+CALL|FAMILIAR ANALOG|DESCRIPTION
 __LE | <= | Less than or equal to.
 __LT | < | Less than.
 __GT | > | Greater than.
